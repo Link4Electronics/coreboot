@@ -4,8 +4,8 @@
 #define SOUTHBRIDGE_INTEL_I82801GX_I82801GX_H
 
 /* TODO Make sure these don't get changed by stage2 */
-#define DEFAULT_GPIOBASE	0x0480
-#define DEFAULT_PMBASE		0x0500
+#define DEFAULT_GPIOBASE	CONFIG_SOUTHBRIDGE_INTEL_I82801GX_GPIOBASE
+#define DEFAULT_PMBASE		CONFIG_SOUTHBRIDGE_INTEL_I82801GX_PMBASE
 
 #include <southbridge/intel/common/lpc_def.h> /* IWYU pragma: export */
 #include <southbridge/intel/common/rcba.h> /* IWYU pragma: export */

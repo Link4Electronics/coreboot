@@ -40,4 +40,18 @@ config INTEL_TOP_SWAP_BOOTBLOCK_SIZE
 	# Always 64K, all other options are invalid
 	default 0x10000
 
+config SOUTHBRIDGE_INTEL_I82801GX_GPIOBASE
+	hex
+	default 0x480
+	help
+	  I/O base of the ICH7 GPIO block.  Boards that must preserve a
+	  firmware-programmed base can override this.
+
+config SOUTHBRIDGE_INTEL_I82801GX_PMBASE
+	hex
+	default 0x500
+	help
+	  I/O base of the ICH7 power management block.  Boards that must
+	  preserve a firmware-programmed base can override this.
+
 endif
