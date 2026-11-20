@@ -11,3 +11,6 @@ config BOARD_APPLE_IMAC41
 
 config BOARD_APPLE_IMAC52
 	bool "iMac5,2"
+
+config BOARD_APPLE_ATV1
+	bool "Apple TV (1st generation)"

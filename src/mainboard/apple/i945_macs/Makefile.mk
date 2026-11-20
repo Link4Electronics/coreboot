@@ -6,3 +6,4 @@ romstage-y += early_init.c
 
 ramstage-y += cstates.c
 ramstage-y += variants/$(VARIANT_DIR)/hda_verb.c
+romstage-$(CONFIG_BOARD_APPLE_ATV1) += variants/atv1/spd.c

@@ -35,6 +35,19 @@ config BOARD_APPLE_IMAC52
 	bool
 	select BOARD_APPLE_I945_MACS_COMMON
 
+config BOARD_APPLE_ATV1
+	bool
+	select BOARD_APPLE_I945_MACS_COMMON
+
+# The ATV1 firmware leaves the ICH7 GPIO block at 0x500 and the PM block
+# at 0x400.  Preserve both windows: the GPIO block is the handshake to the
+# board's power/thermal MCU and must not be relocated.
+config SOUTHBRIDGE_INTEL_I82801GX_GPIOBASE
+	default 0x500 if BOARD_APPLE_ATV1
+
+config SOUTHBRIDGE_INTEL_I82801GX_PMBASE
+	default 0x400 if BOARD_APPLE_ATV1
+
 if BOARD_APPLE_I945_MACS_COMMON
 
 config MAINBOARD_DIR
@@ -45,12 +58,14 @@ config MAINBOARD_PART_NUMBER
 	default "MacBook2,1" if BOARD_APPLE_MACBOOK21
 	default "iMac4,1" if BOARD_APPLE_IMAC41
 	default "iMac5,2" if BOARD_APPLE_IMAC52
+	default "AppleTV1,1" if BOARD_APPLE_ATV1
 
 config VARIANT_DIR
 	default "macbook1_1" if BOARD_APPLE_MACBOOK11
 	default "macbook2_1" if BOARD_APPLE_MACBOOK21
 	default "imac4_1" if BOARD_APPLE_IMAC41
 	default "imac5_2" if BOARD_APPLE_IMAC52
+	default "atv1" if BOARD_APPLE_ATV1
 
 config OVERRIDE_DEVICETREE
 	default "variants/\$(CONFIG_VARIANT_DIR)/overridetree.cb"

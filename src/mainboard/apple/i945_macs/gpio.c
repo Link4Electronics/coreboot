@@ -2,6 +2,17 @@
 
 #include <southbridge/intel/common/gpio.h>
 
+#if CONFIG(BOARD_APPLE_ATV1)
+
+/*
+ * The ATV1's ICH7 GPIO block is the handshake to the autonomous NXP
+ * 89V54RD2 power/thermal MCU.  It must never be reprogrammed.  With every
+ * pointer NULL, setup_pch_gpios() performs no register writes at all.
+ */
+const struct pch_gpio_map mainboard_gpio_map = { 0 };
+
+#else
+
 static const struct pch_gpio_set1 pch_gpio_set1_mode = {
 	.gpio1 = GPIO_MODE_GPIO,
 #if !CONFIG(BOARD_APPLE_IMAC41)
@@ -116,3 +127,5 @@ const struct pch_gpio_map mainboard_gpio_map = {
 		.level		= &pch_gpio_set2_level,
 	},
 };
+
+#endif
