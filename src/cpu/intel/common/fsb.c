@@ -16,6 +16,8 @@ static u32 timer_tsc;
 /* This is not an architectural MSR. */
 #define MSR_PLATFORM_INFO 0xce
 
+#define MSR_EBL_CR_POWERON 0x2a
+
 static int get_fsb_tsc(int *fsb, int *ratio)
 {
 	struct cpuinfo_x86 c;
@@ -29,6 +31,11 @@ static int get_fsb_tsc(int *fsb, int *ratio)
 	switch (c.x86) {
 	case 0x6:
 		switch (c.x86_model) {
+		case 0xd: /* Pentium M (Banias/Dothan) */
+			msr = rdmsr(MSR_EBL_CR_POWERON);
+			*fsb = (msr.lo & (1 << 18)) ? 133 : 100;
+			*ratio = (msr.lo >> 22) & 0x1f;
+			break;
 		case 0xe:  /* Core Solo/Duo */
 		case 0x1c: /* Atom */
 			*fsb = core_fsb[rdmsr(MSR_FSB_FREQ).lo & 7];
@@ -80,7 +87,7 @@ static int get_fsb_tsc(int *fsb, int *ratio)
 	default:
 		return -2;
 	}
-	if (*fsb > 0)
+	if (*fsb > 0 && *ratio > 0)
 		return 0;
 	return -1;
 }
@@ -97,14 +104,17 @@ static void resolve_timebase(void)
 		return;
 	}
 
+	/*
+	 * Set some semi-ridiculous defaults before printing. printk() may use
+	 * the monotonic timer, which calls back into this function.
+	 */
+	timer_fsb = 500;
+	timer_tsc = 5000;
+
 	if (ret == -1)
 		printk(BIOS_ERR, "FSB not found\n");
 	if (ret == -2)
 		printk(BIOS_ERR, "CPU not supported\n");
-
-	/* Set some semi-ridiculous defaults. */
-	timer_fsb = 500;
-	timer_tsc = 5000;
 }
 
 u32 get_timer_fsb(void)
