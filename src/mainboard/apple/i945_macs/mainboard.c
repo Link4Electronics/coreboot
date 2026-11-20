@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 
+#include <acpi/acpi.h>
 #include <device/device.h>
 #include <northbridge/intel/i945/i945.h>
 #include <drivers/intel/gma/int15.h>
@@ -44,6 +45,12 @@ static void mainboard_final(void *chip_info)
 smbios_enclosure_type smbios_mainboard_enclosure_type(void)
 {
 	return SMBIOS_ENCLOSURE_SPACE_SAVING;
+}
+
+/* The vendor FADT identifies the board as an appliance PC. */
+void mainboard_fill_fadt(acpi_fadt_t *fadt)
+{
+	fadt->preferred_pm_profile = PM_APPLIANCE_PC;
 }
 #endif
 

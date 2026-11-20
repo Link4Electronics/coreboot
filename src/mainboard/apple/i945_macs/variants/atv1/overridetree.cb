@@ -32,9 +32,9 @@ chip northbridge/intel/i945
 			register "gen3_dec" = "0"
 			register "gen4_dec" = "0"
 
-			# The vendor FADT has duty_width = 0 and the measured
+			# The vendor FADT has duty_width = 3 and the measured
 			# GEN_PMCON_1 has the C4-on-C3 bit clear.
-			register "p_cnt_throttling_supported" = "false"
+			register "p_cnt_throttling_supported" = "true"
 			register "c4onc3_enable" = "false"
 			register "c3_latency" = "0x10"
 
