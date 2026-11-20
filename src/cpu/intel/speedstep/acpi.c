@@ -146,6 +146,17 @@ static void generate_cpu_entry(int cpu, int core, int cores_per_package)
 	acpigen_pop_len();
 }
 
+static void generate_cpu_entry_without_states(int cpu, int core,
+					      int cores_per_package)
+{
+	/*
+	 * Generate processor \_SB.CPUx without P-state or C-state objects.
+	 * A zero P_BLK keeps the OS from using I/O based C-states.
+	 */
+	acpigen_write_processor(cpu * cores_per_package + core, 0, 0);
+	acpigen_pop_len();
+}
+
 /**
  * @brief Generate ACPI entries for Speedstep for each cpu
  */
@@ -154,15 +165,32 @@ void generate_cpu_entries(const struct device *device)
 	int totalcores = dev_count_cpu();
 	int cores_per_package = (cpuid_ebx(1) >> 16) & 0xff;
 
+	/* Single logical processors may report 0 for the maximum number of
+	 * addressable IDs in the package. Treat that as one core.
+	 */
+	if (cores_per_package == 0)
+		cores_per_package = 1;
+
 	/* This assumes that all CPUs share the same layout. */
 	int numcpus = totalcores / cores_per_package;
+
+	/*
+	 * The generic P-state and C-state tables rely on Core-era MSRs and
+	 * MWAIT resources that the Pentium M does not implement.
+	 */
+	const bool without_states = ((cpuid_eax(1) >> 4) & 0xffff) == 0x006d;
 
 	printk(BIOS_DEBUG, "Found %d CPU(s) with %d core(s) each.\n",
 	       numcpus, cores_per_package);
 
 	for (int cpu_id = 0; cpu_id < numcpus; ++cpu_id)
-		for (int core_id = 0; core_id < cores_per_package; core_id++)
-			generate_cpu_entry(cpu_id, core_id, cores_per_package);
+		for (int core_id = 0; core_id < cores_per_package; core_id++) {
+			if (without_states)
+				generate_cpu_entry_without_states(cpu_id, core_id,
+								  cores_per_package);
+			else
+				generate_cpu_entry(cpu_id, core_id, cores_per_package);
+		}
 
 	/* PPKG is usually used for thermal management
 	   of the first and only package. */
