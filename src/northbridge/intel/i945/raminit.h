@@ -57,4 +57,12 @@ struct sys_info {
 void receive_enable_adjust(struct sys_info *sysinfo);
 void sdram_initialize(int boot_path, const u8 *sdram_addresses);
 int fixup_i945gm_errata(void);
+
+/*
+ * Optional board hook.  Fill raw_spd with the SPD bytes for the given
+ * socket and return the number of bytes written, or return 0 to have the
+ * raminit read the SPD from SMBus as usual.
+ */
+int mainboard_get_spd(int socket, u8 *raw_spd, size_t len);
+
 #endif				/* RAMINIT_H */

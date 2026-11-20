@@ -24,6 +24,11 @@ __weak void mainboard_get_spd_map(u8 spd_map[4])
 	spd_map[3] = 0x53;
 }
 
+__weak int mainboard_get_spd(int socket, u8 *raw_spd, size_t len)
+{
+	return 0;
+}
+
 void mainboard_romstage_entry(void)
 {
 	bool s3resume = false;

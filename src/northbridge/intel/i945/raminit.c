@@ -329,30 +329,39 @@ static void gather_common_timing(struct sys_info *sysinfo, struct timings *saved
 		if (!sdram_capabilities_dual_channel() && (i >> 1))
 			continue;
 
-		if (smbus_read_byte(device, SPD_MEMORY_TYPE) !=
-					SPD_MEMORY_TYPE_SDRAM_DDR2) {
-			printk(BIOS_DEBUG, "DDR II Channel %d Socket %d: N/A\n",
+		bytes_read = mainboard_get_spd(i, raw_spd, sizeof(raw_spd));
+		if (bytes_read > 0) {
+			printk(BIOS_DEBUG, "DDR II Channel %d Socket %d: "
+				"using board-supplied SPD\n",
 				(i >> 1), (i & 1));
-			continue;
-		}
-
-		/*
-		 * spd_decode_ddr2() needs a 128-byte sized array but
-		 * only the first 64 bytes contain data needed for raminit.
-		 */
-
-		bytes_read = i2c_eeprom_read(device, 0, 64, raw_spd);
-		printk(BIOS_DEBUG, "Reading SPD using i2c block operation.\n");
-		if (CONFIG(DEBUG_RAM_SETUP) && bytes_read > 0)
-			hexdump(raw_spd, bytes_read);
-		if (bytes_read != 64) {
-			/* Try again with SMBUS byte read */
-			printk(BIOS_DEBUG, "i2c block operation failed,"
-				" trying smbus byte operation.\n");
-			for (j = 0; j < 64; j++)
-				raw_spd[j] = smbus_read_byte(device, j);
 			if (CONFIG(DEBUG_RAM_SETUP))
 				hexdump(raw_spd, 64);
+		} else {
+			if (smbus_read_byte(device, SPD_MEMORY_TYPE) !=
+						SPD_MEMORY_TYPE_SDRAM_DDR2) {
+				printk(BIOS_DEBUG, "DDR II Channel %d Socket %d: N/A\n",
+					(i >> 1), (i & 1));
+				continue;
+			}
+
+			/*
+			 * spd_decode_ddr2() needs a 128-byte sized array but
+			 * only the first 64 bytes contain data needed for raminit.
+			 */
+
+			bytes_read = i2c_eeprom_read(device, 0, 64, raw_spd);
+			printk(BIOS_DEBUG, "Reading SPD using i2c block operation.\n");
+			if (CONFIG(DEBUG_RAM_SETUP) && bytes_read > 0)
+				hexdump(raw_spd, bytes_read);
+			if (bytes_read != 64) {
+				/* Try again with SMBUS byte read */
+				printk(BIOS_DEBUG, "i2c block operation failed,"
+					" trying smbus byte operation.\n");
+				for (j = 0; j < 64; j++)
+					raw_spd[j] = smbus_read_byte(device, j);
+				if (CONFIG(DEBUG_RAM_SETUP))
+					hexdump(raw_spd, 64);
+			}
 		}
 
 		if (spd_decode_ddr2(&dimm_info, raw_spd) != SPD_STATUS_OK) {
