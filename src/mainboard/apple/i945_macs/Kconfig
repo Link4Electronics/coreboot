@@ -76,6 +76,9 @@ config MAX_CPUS
 config MAINBOARD_SMBIOS_MANUFACTURER
 	default "Apple Inc."
 
+config MAINBOARD_FAMILY
+	default "AppleTV" if BOARD_APPLE_ATV1
+
 endif
 
 if BOARD_APPLE_IMAC41

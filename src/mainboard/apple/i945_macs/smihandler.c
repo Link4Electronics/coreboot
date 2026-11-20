@@ -3,6 +3,12 @@
 #include <cpu/x86/smm.h>
 #include <southbridge/intel/common/pmutil.h>
 
+#if !CONFIG(BOARD_APPLE_ATV1)
+
+/*
+ * The Apple TV 1st gen has no embedded controller, so there is no EC SCI to
+ * route.  GPI12 is also an output on this board.
+ */
 #define GPE_EC_SCI	12
 
 int mainboard_smi_apmc(u8 data)
@@ -21,3 +27,5 @@ int mainboard_smi_apmc(u8 data)
 	}
 	return 0;
 }
+
+#endif

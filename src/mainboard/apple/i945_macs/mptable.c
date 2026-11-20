@@ -38,8 +38,14 @@ static void *smp_write_config_table(void *v)
 	smp_write_pci_intsrc(mc, mp_INT, 0x00, 0x1d, 0x03, ioapic_id, 0x10); /* USB       0:1d.3 */
 	smp_write_pci_intsrc(mc, mp_INT, 0x00, 0x1f, 0x00, ioapic_id, 0x12); /* LPC       0:1f.0 */
 	smp_write_pci_intsrc(mc, mp_INT, 0x00, 0x1f, 0x01, ioapic_id, 0x13); /* IDE       0:1f.1 */
-	smp_write_pci_intsrc(mc, mp_INT, 0x00, 0x1f, 0x03, ioapic_id, 0x10); /* SATA      0:1f.3 */
+	smp_write_pci_intsrc(mc, mp_INT, 0x00, 0x1f, 0x03, ioapic_id, 0x10); /* SMBus     0:1f.3 */
+#if CONFIG(BOARD_APPLE_ATV1)
+	smp_write_pci_intsrc(mc, mp_INT, 0x00, 0x1e, 0x00, ioapic_id, 0x16); /* PCI bridge A 0:1e.0 */
+	smp_write_pci_intsrc(mc, mp_INT, 0x00, 0x1e, 0x01, ioapic_id, 0x14); /* PCI bridge B 0:1e.0 */
+	smp_write_pci_intsrc(mc, mp_INT, 0x02, 0x03, 0x00, ioapic_id, 0x14); /* RTL8100C     2:03.0 */
+#else
 	smp_write_pci_intsrc(mc, mp_INT, 0x03, 0x03, 0x00, ioapic_id, 0x13); /* Firewire  3:03.0 */
+#endif
 
 	mptable_lintsrc(mc, isa_bus);
 	return mptable_finalize(mc);
