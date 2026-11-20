@@ -27,7 +27,10 @@ static int get_cpu_count(void)
 
 	printk(BIOS_DEBUG, "CPU has %u cores.\n", cores);
 
-	return cores;
+	/* Single logical processors may report 0 for the maximum number of
+	 * addressable IDs in the package. Treat that as one CPU.
+	 */
+	return cores ? cores : 1;
 }
 
 static void get_microcode_info(const void **microcode, size_t *size, int *parallel)
